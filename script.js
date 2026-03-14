@@ -3,7 +3,10 @@ const words = [
     { word: "elephant", hint: "The largest land animal." },
     { word: "guitar", hint: "A stringed musical instrument." },
     { word: "python", hint: "A popular programming language and a snake." },
-    { word: "mountain", hint: "A large natural elevation of the earth's surface." }
+    { word: "mountain", hint: "A large natural elevation of the earth's surface." },
+    { word: "galaxy", hint: "A massive gravitationally bound system of stars, gas, and dust." },
+    { word: "nebula", hint: "A giant cloud of dust and gas in space." },
+    { word: "astronaut", hint: "A person trained by a human spaceflight program to command, pilot, or serve as a crew member of a spacecraft." }
 ];
 
 let selectedWord, hint, guessedLetters, wrongGuesses, maxWrong;
@@ -17,53 +20,111 @@ function startGame() {
     maxWrong = 6;
     document.getElementById('hint').textContent = `Hint: ${hint}`;
     document.getElementById('message').textContent = '';
+    document.getElementById('message').className = '';
     document.getElementById('wrongGuesses').textContent = '';
     document.getElementById('guessInput').value = '';
     updateWordDisplay();
 }
 
-function updateWordDisplay() {
-    let display = '';
+function updateWordDisplay(newlyGuessedLetter = null) {
+    const wordDisplay = document.getElementById('wordDisplay');
+    wordDisplay.innerHTML = '';
+    
     for (let char of selectedWord) {
+        const span = document.createElement('span');
+        span.className = 'letter-box';
+        
         if (guessedLetters.includes(char)) {
-            display += char + ' ';
+            span.textContent = char.toUpperCase();
+            if (char === newlyGuessedLetter) {
+                span.classList.add('letter-correct');
+            }
         } else {
-            display += '_ ';
+            span.textContent = '_';
         }
+        wordDisplay.appendChild(span);
+        // Add a space between letters
+        const space = document.createTextNode(' ');
+        wordDisplay.appendChild(space);
     }
-    document.getElementById('wordDisplay').textContent = display.trim();
+}
+
+function launchLetter(letter) {
+    const launcher = document.createElement('div');
+    launcher.textContent = letter.toUpperCase();
+    launcher.className = 'launching-letter';
+    
+    // Position it roughly where the input is
+    const inputRect = document.getElementById('guessInput').getBoundingClientRect();
+    launcher.style.left = inputRect.left + (inputRect.width / 2) - 15 + 'px';
+    launcher.style.top = inputRect.top + 'px';
+    
+    document.body.appendChild(launcher);
+    
+    setTimeout(() => {
+        launcher.remove();
+    }, 800);
 }
 
 function handleGuess() {
     const input = document.getElementById('guessInput');
     let guess = input.value.toLowerCase();
     input.value = '';
+    input.focus();
+    
+    const msgEl = document.getElementById('message');
+    
     if (!guess.match(/^[a-z]$/)) {
-        document.getElementById('message').textContent = 'Please enter a single letter.';
+        msgEl.className = 'msg-error';
+        msgEl.textContent = 'Enter a single letter!';
+        shakeElement(msgEl);
         return;
     }
     if (guessedLetters.includes(guess) || wrongGuesses.includes(guess)) {
-        document.getElementById('message').textContent = 'You already guessed that letter!';
+        msgEl.className = 'msg-error';
+        msgEl.textContent = 'Letter already used!';
+        shakeElement(msgEl);
         return;
     }
+    
+    launchLetter(guess);
+    
     if (selectedWord.includes(guess)) {
         guessedLetters.push(guess);
-        document.getElementById('message').textContent = 'Correct!';
+        msgEl.className = 'msg-success';
+        msgEl.textContent = 'Great shot!';
+        updateWordDisplay(guess);
     } else {
         wrongGuesses.push(guess);
-        document.getElementById('message').textContent = 'Wrong!';
+        msgEl.className = 'msg-error';
+        msgEl.textContent = 'Missed!';
+        shakeElement(msgEl);
     }
-    document.getElementById('wrongGuesses').textContent = wrongGuesses.join(', ');
-    updateWordDisplay();
+    
+    document.getElementById('wrongGuesses').textContent = wrongGuesses.map(g => g.toUpperCase()).join(', ');
+    
+    if (!selectedWord.includes(guess)) {
+        updateWordDisplay(); 
+    }
+    
     checkGameStatus();
 }
 
+function shakeElement(el) {
+    el.style.animation = 'none';
+    el.offsetHeight; /* trigger reflow */
+    el.style.animation = null; 
+}
+
 function checkGameStatus() {
+    const msgEl = document.getElementById('message');
     if (selectedWord.split('').every(char => guessedLetters.includes(char))) {
-        document.getElementById('message').textContent = 'Congratulations! You guessed the word!';
+        msgEl.className = 'msg-success';
+        msgEl.textContent = 'Mission Accomplished!';
         disableInput();
     } else if (wrongGuesses.length >= maxWrong) {
-        document.getElementById('message').textContent = `Game Over! The word was "${selectedWord}".`;
+        msgEl.className = 'msg-error';
+        msgEl.textContent = `Game Over! The word was "${selectedWord.toUpperCase()}".`;
         disableInput();
     }
 }
@@ -76,6 +137,7 @@ function disableInput() {
 function enableInput() {
     document.getElementById('guessInput').disabled = false;
     document.getElementById('guessBtn').disabled = false;
+    document.getElementById('guessInput').focus();
 }
 
 document.getElementById('guessBtn').addEventListener('click', handleGuess);

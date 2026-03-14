@@ -3,20 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Guessing Game</title>
+    <title>Antigravity Word Game</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>Word Guessing Game</h1>
-        <p id="hint"></p>
-        <div id="wordDisplay"></div>
-        <input type="text" id="guessInput" maxlength="1" placeholder="Enter a letter">
-        <button id="guessBtn">Guess</button>
-        <p id="message"></p>
-        <p>Wrong guesses: <span id="wrongGuesses"></span></p>
-        <button id="restartBtn">Restart Game</button>
+    <canvas id="starfield"></canvas>
+    <div class="vignette"></div>
+
+    <div class="container glow-panel">
+        <div class="header-section">
+            <h1 class="cyber-title" data-text="ANTIGRAVITY">ANTIGRAVITY</h1>
+            <div class="system-status">
+                <div class="status-label">HULL INTEGRITY</div>
+                <div class="health-track">
+                    <div id="healthBar" class="health-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mission-brief">
+            <span class="scan-line"></span>
+            <p id="hint"></p>
+        </div>
+
+        <div id="wordDisplay" class="word-grid"></div>
+
+        <div class="terminal-interface">
+            <div class="input-matrix">
+                <div class="target-bracket left">[</div>
+                <input type="text" id="guessInput" maxlength="1" placeholder="_" autocomplete="off" spellcheck="false">
+                <div class="target-bracket right">]</div>
+            </div>
+            
+            <button id="guessBtn" class="cyber-btn primary">
+                <span class="btn-content">ENGAGE THRUSTERS</span>
+                <span class="btn-glitch"></span>
+            </button>
+        </div>
+
+        <div class="comms-panel">
+            <p id="message" class="system-msg"></p>
+        </div>
+        
+        <button id="restartBtn" class="cyber-btn danger hidden">
+            <span>INITIATE PROTOCOL: RESTART</span>
+        </button>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
